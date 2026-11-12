@@ -2,7 +2,7 @@
 
 Actera decides whether AI agents may take actions. This plugin sends each GitHub Copilot CLI tool call to your Actera workspace before it runs. Your policies allow it, block it, or hold it until a reviewer approves, and every attempt is recorded as a decision with its outcome.
 
-The plugin is tested with the GitHub Copilot CLI. VS Code, the GitHub Copilot app and Copilot in the cloud can also load Copilot plugins; the hooks have not been tested there. It needs an Actera account, Node.js 22 or later, and GitHub Copilot CLI 1.0.109 or later.
+The plugin is tested with the GitHub Copilot CLI and with the Copilot agent in VS Code, which picks up plugins installed with the CLI and uses the same connection and mode. The GitHub Copilot app and Copilot in the cloud can also load Copilot plugins; the hooks have not been tested there. It needs an Actera account, Node.js 22 or later, and GitHub Copilot CLI 1.0.109 or later.
 
 ## Get started
 
