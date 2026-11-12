@@ -1,0 +1,37 @@
+{
+  "name": "@actera-ai/agent-hooks",
+  "version": "0.5.0",
+  "host": "copilot",
+  "source": {
+    "release": "v0.5.0",
+    "url": "https://github.com/Actera-AI/actera-agent-hooks/releases/tag/v0.5.0"
+  },
+  "archiveSha256": "5f44295cd2c9db39e2b770391da12467dfb91da9d1b4d8ca957134872a4fecce",
+  "files": {
+    "bin/delivery-worker.mjs": "6ba3ffe9364505f0bf6480a9f4f4c528a02e28786c92e6e70ff07572052fad67",
+    "LICENSE": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4",
+    "NOTICE": "33e6191cdfa3f4bf180c663b1a5b529d390189d93b1457229fc4d9e1bf654f29",
+    "package.json": "06d8f31202dc17b29d3dbe3298ba1b6eb07a90cec9d08283aa3111519c292b5d",
+    "README.md": "5304f4cabc1fd8da97a542ee572b4b5d6bbf312c82c8d328fa8417b5fcfaafff",
+    "src/core/bridge.mjs": "0b1ded6313e1e0e6abbff2abb352d951a4fc69393f64c80328c90b44500226f6",
+    "src/core/defaults.mjs": "a80c68670f0a66376ff8842cda5875d5a33ea932950163859c056b284c4eded7",
+    "src/core/delivery.mjs": "a0c6b074e93d679f02fbe77df08fe016ea0b457b123cb3796cc076781f1cd784",
+    "src/core/generated/outcomes.mjs": "27c00ac7cdbdf28696ddadb71d46225df6b7ce86d82695ea7e6686fc517f3482",
+    "src/core/input-capture.mjs": "ee939fcecb5b91faa4e7679c56d5b53817f124806fff623f914c47f6ea431b66",
+    "src/core/pairing.mjs": "68fdfce08b3d3b3d05c38b5e2b5b5b5688eb5cc3744a2704481be87cd06e0c68",
+    "src/core/scanner-client.mjs": "1e0085cf407258c8f962fe759a740dbe825186bedbc4ce2781c2b8f5ee68517e",
+    "src/core/settings.mjs": "2bfe6ac11530a2eb0aac60828332b2ff87b638e8e9dcdcbef59252c66ee2052f",
+    "src/hosts/copilot/bridge.mjs": "131c681ecdb3ab298a139de8316ddd803699359245a7d9ce6061435bd27b9937",
+    "src/hosts/copilot/cli.mjs": "fdb5bcc2c961fb63d76d6cbe59d991e9523f1cc6bd3f3093fa706b92a951394f",
+    "src/hosts/copilot/pre-tool-use.mjs": "69c0667af3e937cfdd787a89ee8a7314954312fab278ed1dd8bcee03d66ebe01",
+    "vendor/gitleaks/darwin-arm64.gz": "08caea0c09141b6951b5853c5dc09abb14fc5a0a4b557c73d47fcf39a82b9c8b",
+    "vendor/gitleaks/darwin-x64.gz": "97db858929e72cdf88de9da72a7e402f0cd1fc9087130f56e5ad49e146282687",
+    "vendor/gitleaks/LICENSE": "e3884b252b3bfc045e55be43a34d1e80da070bc6f804ac95bf4660e97d62ebc6",
+    "vendor/gitleaks/linux-arm64.gz": "6228d19977863ab49928d4dae8f7b6fb50ca703609ed5e521519511094e356f9",
+    "vendor/gitleaks/linux-x64.gz": "90a87055806b27d1f68077f6e2e3db6b0d75c5eb55c1e0e1ecb4effa8b579468",
+    "vendor/gitleaks/manifest.json": "de7be91d1ebbf34a6a46bbb839f1e06370c85ef87e764f716c091d2ef864c7b5",
+    "vendor/gitleaks/THIRD_PARTY_NOTICES.txt": "e07094a3796a1559f9b31a8556fcb8079d8772735250bad200760d231207d63e",
+    "vendor/gitleaks/win32-arm64.gz": "97666cd1d66efdea7f8c4e8507f26f2d49b366fc270356b944ecacd1847d722a",
+    "vendor/gitleaks/win32-x64.gz": "23dc1d97ee74431bbd788b50e9dd2e459bd81746a9815e8e3699af0afb8d6187"
+  }
+}

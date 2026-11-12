@@ -1,0 +1,124 @@
+name: ci
+"on":
+  push:
+    branches:
+      - main
+  pull_request: null
+  workflow_dispatch: {}
+permissions:
+  contents: read
+jobs:
+  distribution:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: 24
+      - name: Vendored files match the agent-hooks release named in the lock
+        run: npm run check:release
+        timeout-minutes: 5
+      - name: Scan Git history for secrets
+        run: bash scripts/scan-secrets.sh
+        timeout-minutes: 5
+    timeout-minutes: 15
+  plugin:
+    strategy:
+      fail-fast: false
+      matrix:
+        os:
+          - ubuntu-latest
+          - macos-latest
+          - windows-latest
+        node:
+          - 24
+        include:
+          - os: ubuntu-latest
+            node: 22
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: ${{ matrix.node }}
+      - name: Vendored package, manifest, hooks and skills
+        run: npm test
+        shell: bash
+        timeout-minutes: 5
+      - name: Installed payload
+        run: npm run check:plugin
+        timeout-minutes: 5
+      - name: Install from this checkout with the Copilot CLI
+        env:
+          COPILOT_HOME: ${{ runner.temp }}/copilot-home
+          COPILOT_AUTO_UPDATE: "false"
+        run: |
+          mkdir -p "$COPILOT_HOME"
+          npm install --prefix .tools/copilot-ci --no-audit --no-fund --no-save @github/copilot@1.0.109
+          npm exec --prefix .tools/copilot-ci -- copilot plugin marketplace add ./
+          npm exec --prefix .tools/copilot-ci -- copilot plugin install actera@actera
+          npm exec --prefix .tools/copilot-ci -- copilot plugin list
+          npm exec --prefix .tools/copilot-ci -- copilot skill list > "$RUNNER_TEMP/skills.txt"
+          for skill in connect status mode disconnect; do grep -q "^  $skill - " "$RUNNER_TEMP/skills.txt"; done
+          npm exec --prefix .tools/copilot-ci -- copilot plugin uninstall actera
+          npm exec --prefix .tools/copilot-ci -- copilot plugin install ./plugins/actera
+          node scripts/check-plugin.mjs "$(ls -d "$COPILOT_HOME"/installed-plugins/_direct/actera-*)"
+        shell: bash
+        timeout-minutes: 10
+    timeout-minutes: 20
+  remote-install:
+    # A pull request from a fork has no branch in this repository to install from.
+    if: ${{ github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository }}
+    needs:
+      - distribution
+      - plugin
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: 24
+      - name: Install from the GitHub repository
+        env:
+          COPILOT_HOME: ${{ runner.temp }}/copilot-remote-home
+          COPILOT_AUTO_UPDATE: "false"
+          REF: ${{ github.head_ref || github.ref_name }}
+        run: |
+          mkdir -p "$COPILOT_HOME"
+          npm install --prefix .tools/copilot-ci --no-audit --no-fund --no-save @github/copilot@1.0.109
+          npm exec --prefix .tools/copilot-ci -- copilot plugin marketplace add "${GITHUB_REPOSITORY}#${REF}"
+          npm exec --prefix .tools/copilot-ci -- copilot plugin install actera@actera
+          npm exec --prefix .tools/copilot-ci -- copilot plugin list
+          npm exec --prefix .tools/copilot-ci -- copilot skill list > "$RUNNER_TEMP/skills.txt"
+          for skill in connect status mode disconnect; do grep -q "^  $skill - " "$RUNNER_TEMP/skills.txt"; done
+          node scripts/check-plugin.mjs "$COPILOT_HOME/installed-plugins/actera/actera"
+        shell: bash
+        timeout-minutes: 10
+    timeout-minutes: 15
+  ci-result:
+    if: ${{ always() }}
+    needs:
+      - distribution
+      - plugin
+      - remote-install
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - name: Require every selected check to pass
+        env:
+          NEEDS: ${{ toJSON(needs) }}
+          REMOTE: ${{ github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository }}
+        run: |
+          node <<'NODE'
+          const needs = JSON.parse(process.env.NEEDS);
+          const checks = { distribution: true, plugin: true, 'remote-install': process.env.REMOTE === 'true' };
+          for (const [job, required] of Object.entries(checks)) {
+            if (needs[job].result !== (required ? 'success' : 'skipped')) throw new Error(`${job}: ${needs[job].result}`);
+          }
+          NODE
+        timeout-minutes: 5
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
