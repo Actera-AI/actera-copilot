@@ -2,7 +2,7 @@
 
 Actera decides whether AI agents may take actions. This plugin sends each GitHub Copilot CLI tool call to your Actera workspace before it runs. Your policies allow it, block it, or hold it until a reviewer approves, and every attempt is recorded as a decision with its outcome.
 
-The plugin works in the GitHub Copilot CLI only. Copilot in an editor and the Copilot cloud agent do not load CLI plugins. It needs an Actera account, Node.js 22 or later, and GitHub Copilot CLI 1.0.109 or later.
+The plugin is tested with the GitHub Copilot CLI. VS Code, the GitHub Copilot app and Copilot in the cloud can also load Copilot plugins; the hooks have not been tested there. It needs an Actera account, Node.js 22 or later, and GitHub Copilot CLI 1.0.109 or later.
 
 ## Get started
 
@@ -48,7 +48,9 @@ Privacy policy: <https://actera.dev/legal/privacy-policy>
 
 Keys, settings, and queued reports are stored in `~/.actera/copilot`. The agent key cannot administer the workspace or read full decisions. `/actera:disconnect` removes all of it.
 
-Copilot lets a call run when a hook exceeds its timeout, and a disabled or uninstalled plugin checks nothing. For mandatory enforcement, deploy the same hooks as Copilot policy hooks on each machine.
+Copilot lets a call run when a hook exceeds its timeout, and a disabled or uninstalled plugin checks nothing. For mandatory enforcement, deploy the same hooks as Copilot [policy hooks](https://docs.github.com/en/copilot/reference/hooks-reference) on each machine.
+
+Copilot keeps one skill per name, and a skill of your own wins. With your own skill named `connect`, `status`, `mode` or `disconnect`, that Actera command is unknown to Copilot; run `node bin/actera-hook.mjs <command>` from this folder instead.
 
 ## Help
 

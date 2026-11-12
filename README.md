@@ -15,8 +15,8 @@ Alpha, tested on Windows with GitHub Copilot CLI 1.0.109. CI installs the plugin
 Copilot CLI on Linux, macOS and Windows. Behavior and settings can change between minor
 versions before 1.0; see [CHANGELOG.md](CHANGELOG.md).
 
-Copilot plugins load in the Copilot CLI only. Copilot in an editor and the Copilot cloud
-agent do not run them.
+VS Code, the GitHub Copilot app and Copilot in the cloud can also load Copilot plugins, and
+VS Code picks up plugins installed with the CLI. The hooks have not been tested there.
 
 ## Installation
 
@@ -112,8 +112,14 @@ ACLs. Never put the key in a repository or in Copilot's settings.
 ## Limits
 
 - Copilot lets a call run when a hook exceeds its timeout, so the plugin denies a held call
-  before Copilot's 600 second hook timeout. A disabled or uninstalled plugin checks nothing.
-  For mandatory enforcement, deploy the same hooks as Copilot policy hooks on each machine.
+  before its own 600 second hook timeout. A disabled or uninstalled plugin checks nothing.
+  For mandatory enforcement, deploy the same hooks as Copilot
+  [policy hooks](https://docs.github.com/en/copilot/reference/hooks-reference) on each
+  machine, with the full path to `actera-hook.mjs` in place of `${PLUGIN_ROOT}`.
+- Copilot keeps one skill per name, and a skill of your own wins over a plugin's. With your
+  own skill named `connect`, `status`, `mode` or `disconnect`, that Actera command is
+  unknown to Copilot. Run the plugin's command line instead, for example
+  `node ~/.copilot/installed-plugins/actera/actera/bin/actera-hook.mjs status`.
 - Copilot names an MCP tool `<server>-<tool>`. The plugin reads which server a call went to
   from Copilot's session log; when that record is missing the call is recorded as
   `copilot.tool.<server>-<tool>`.

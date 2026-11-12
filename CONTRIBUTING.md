@@ -52,7 +52,7 @@ override applies only at pairing time and is stored as that connection's
 `baseUrl`, so switching services means reconnecting. Set
 `ACTERA_COPILOT_BRIDGE_HOME` to keep a test connection apart from your own
 `~/.actera/copilot`, and `COPILOT_HOME` to keep a test Copilot apart from your own
-`~/.copilot`.
+`~/.copilot`. Keep the test agent, machine key and bridge state outside the repository.
 
 A local marketplace loads the plugin live from the checkout, so edits apply to the
 next Copilot session:

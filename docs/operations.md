@@ -25,9 +25,12 @@ returns Copilot's `permissionDecision`; the other two queue the execution report
 
 Copilot denies a call when a `preToolUse` hook exits with an error, and lets it run
 when the hook exceeds its timeout. The hook therefore always exits cleanly, denies
-on its own only in Enforcing, and ends a held call before the 600 second timeout.
-A disabled or uninstalled plugin checks nothing; for mandatory enforcement, deploy
-the same hooks as Copilot policy hooks on each machine.
+on its own only in Enforcing, and ends a held call before the plugin's 600 second
+hook timeout. A disabled or uninstalled plugin checks nothing; for mandatory
+enforcement, deploy the same hooks as Copilot
+[policy hooks](https://docs.github.com/en/copilot/reference/hooks-reference) on each
+machine. A policy file has no `${PLUGIN_ROOT}`, so give it the full path to
+`actera-hook.mjs`.
 
 ## Held calls
 

@@ -60,6 +60,8 @@ jobs:
           npm exec --prefix .tools/copilot-ci -- copilot plugin marketplace add ./
           npm exec --prefix .tools/copilot-ci -- copilot plugin install actera@actera
           npm exec --prefix .tools/copilot-ci -- copilot plugin list
+          npm exec --prefix .tools/copilot-ci -- copilot skill list > "$RUNNER_TEMP/skills.txt"
+          for skill in connect status mode disconnect; do grep -q "^  $skill - " "$RUNNER_TEMP/skills.txt"; done
           npm exec --prefix .tools/copilot-ci -- copilot plugin uninstall actera
           npm exec --prefix .tools/copilot-ci -- copilot plugin install ./plugins/actera
           node scripts/check-plugin.mjs "$(ls -d "$COPILOT_HOME"/installed-plugins/_direct/actera-*)"
@@ -67,7 +69,8 @@ jobs:
         timeout-minutes: 10
     timeout-minutes: 20
   remote-install:
-    if: ${{ github.event_name != 'pull_request' }}
+    # A pull request from a fork has no branch in this repository to install from.
+    if: ${{ github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository }}
     needs:
       - distribution
       - plugin
@@ -81,12 +84,15 @@ jobs:
         env:
           COPILOT_HOME: ${{ runner.temp }}/copilot-remote-home
           COPILOT_AUTO_UPDATE: "false"
+          REF: ${{ github.head_ref || github.ref_name }}
         run: |
           mkdir -p "$COPILOT_HOME"
           npm install --prefix .tools/copilot-ci --no-audit --no-fund --no-save @github/copilot@1.0.109
-          npm exec --prefix .tools/copilot-ci -- copilot plugin marketplace add "$GITHUB_REPOSITORY"
+          npm exec --prefix .tools/copilot-ci -- copilot plugin marketplace add "${GITHUB_REPOSITORY}#${REF}"
           npm exec --prefix .tools/copilot-ci -- copilot plugin install actera@actera
           npm exec --prefix .tools/copilot-ci -- copilot plugin list
+          npm exec --prefix .tools/copilot-ci -- copilot skill list > "$RUNNER_TEMP/skills.txt"
+          for skill in connect status mode disconnect; do grep -q "^  $skill - " "$RUNNER_TEMP/skills.txt"; done
           node scripts/check-plugin.mjs "$COPILOT_HOME/installed-plugins/actera/actera"
         shell: bash
         timeout-minutes: 10
@@ -103,7 +109,7 @@ jobs:
       - name: Require every selected check to pass
         env:
           NEEDS: ${{ toJSON(needs) }}
-          REMOTE: ${{ github.event_name != 'pull_request' }}
+          REMOTE: ${{ github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository }}
         run: |
           node <<'NODE'
           const needs = JSON.parse(process.env.NEEDS);

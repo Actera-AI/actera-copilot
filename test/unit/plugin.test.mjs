@@ -1,8 +1,10 @@
 import assert from 'node:assert/strict'
+import { execFileSync } from 'node:child_process'
 import { copyFile, mkdir, mkdtemp, readFile, rm, writeFile } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { dirname, join } from 'node:path'
 import test from 'node:test'
+import { fileURLToPath } from 'node:url'
 import { checkPlugin, pluginFiles, skills } from '../../scripts/check-plugin.mjs'
 import { checkVendored } from '../../scripts/vendor-agent-hooks.mjs'
 
@@ -24,6 +26,20 @@ test('every tool call goes through the vendored Copilot adapter, with time to ho
   assert.equal(config.hooks.preToolUse[0].timeoutSec, 600)
   const shim = await readFile(new URL('../../plugins/actera/bin/actera-hook.mjs', import.meta.url), 'utf8')
   assert.match(shim, /^import '\.\.\/vendor\/agent-hooks\/src\/hosts\/copilot\/cli\.mjs'$/m)
+})
+
+test('the shipped command line runs from the plugin folder and the lock is for Copilot', async (t) => {
+  const home = await mkdtemp(join(tmpdir(), 'actera-copilot-entry-'))
+  t.after(() => rm(home, { recursive: true, force: true }))
+  const entry = fileURLToPath(new URL('../../plugins/actera/bin/actera-hook.mjs', import.meta.url))
+  const env = { ...process.env, ACTERA_COPILOT_BRIDGE_HOME: home }
+  for (const name of ['ACTERA_MODE', 'ACTERA_EVALUATION_FAILURE']) delete env[name]
+  const status = JSON.parse(execFileSync(process.execPath, [entry, 'status'], { env, encoding: 'utf8' }))
+  assert.deepEqual([status.configured, status.settings.modeName, status.settingsManagedBy], [false, 'monitoring', '/actera:mode'])
+  // An unconnected hook lets the call through without output.
+  const hook = execFileSync(process.execPath, [entry, 'hook', 'preToolUse'], { env, encoding: 'utf8', input: JSON.stringify({ toolName: 'view', toolArgs: {} }) })
+  assert.equal(hook, '')
+  assert.equal((await json('scripts/agent-hooks.lock.json')).host, 'copilot')
 })
 
 test('the marketplace lists this plugin and the manifest names its hooks and skills', async () => {

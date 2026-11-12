@@ -30,8 +30,9 @@ node scripts/check-plugin.mjs "$COPILOT_HOME"/installed-plugins/_direct/actera-*
 
 The checker compares every installed runtime and license file, and the scanner
 checksums, with the checkout, and rejects extra or missing files. CI runs the same
-install on Linux, macOS and Windows for every pull request. After a merge to
-`main`, it also installs from the GitHub repository.
+install on Linux, macOS and Windows for every pull request. It also adds the
+branch on GitHub as a marketplace and installs from it, which is the path users
+take; a pull request from a fork gets that second install once it is merged.
 
 ## Host acceptance
 
