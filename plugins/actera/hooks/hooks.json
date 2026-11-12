@@ -1,0 +1,29 @@
+{
+  "version": 1,
+  "hooks": {
+    "preToolUse": [
+      {
+        "type": "command",
+        "exec": "node",
+        "args": ["${PLUGIN_ROOT}/bin/actera-hook.mjs", "hook", "preToolUse"],
+        "timeoutSec": 600
+      }
+    ],
+    "postToolUse": [
+      {
+        "type": "command",
+        "exec": "node",
+        "args": ["${PLUGIN_ROOT}/bin/actera-hook.mjs", "hook", "postToolUse"],
+        "timeoutSec": 30
+      }
+    ],
+    "postToolUseFailure": [
+      {
+        "type": "command",
+        "exec": "node",
+        "args": ["${PLUGIN_ROOT}/bin/actera-hook.mjs", "hook", "postToolUseFailure"],
+        "timeoutSec": 30
+      }
+    ]
+  }
+}

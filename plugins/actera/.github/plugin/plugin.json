@@ -1,0 +1,15 @@
+{
+  "name": "actera",
+  "version": "0.1.0",
+  "description": "Check GitHub Copilot CLI tool calls against Actera policies, hold calls that need approval, and report their outcomes",
+  "author": {
+    "name": "Actera",
+    "url": "https://actera.dev"
+  },
+  "homepage": "https://actera.dev",
+  "repository": "https://github.com/Actera-AI/actera-copilot",
+  "license": "Apache-2.0",
+  "keywords": ["actera", "policy", "approvals", "hooks", "governance"],
+  "skills": "skills/",
+  "hooks": "hooks/hooks.json"
+}
