@@ -88,8 +88,8 @@ external effect took place.
 ## Data and credentials
 
 Each decision request sends the tool name, the redacted tool input, the MCP server and tool
-name for MCP tools, and Copilot's session, subagent and tool call identifiers and working
-directory. Execution reports repeat the same action and context. Prompt text, model output
+name for MCP tools, Copilot's session and subagent identifiers, the tool call identifier
+where Copilot passes one, and the working directory. Execution reports repeat the same action and context. Prompt text, model output
 and tool results are never sent.
 
 The plugin redacts sensitive field names and uses bundled Gitleaks 8.30.1 to detect
@@ -127,8 +127,8 @@ ACLs. Never put the key in a repository or in Copilot's settings.
   `copilot.tool.<server>-<tool>`.
 - Approvals happen in Actera, Slack or email. Copilot cannot ask about a held call from a
   hook.
-- The Copilot runtime in VS Code gives tool calls no ID, so there an outcome is matched to
-  its call by session, tool and exact arguments. Two identical calls in one turn can have
+- The Copilot runtime in VS Code passes hooks no tool call ID, so there an outcome is matched
+  to its call by session, tool and exact arguments. Two identical calls in one turn can have
   their outcomes swapped.
 
 See [operations](docs/operations.md) for status, delivery, disconnecting and credential

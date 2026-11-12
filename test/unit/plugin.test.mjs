@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict'
-import { execFileSync } from 'node:child_process'
+import { execFileSync, spawn } from 'node:child_process'
+import { createServer } from 'node:http'
 import { copyFile, mkdir, mkdtemp, readFile, rm, writeFile } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { dirname, join } from 'node:path'
@@ -40,6 +41,44 @@ test('the shipped command line runs from the plugin folder and the lock is for C
   const hook = execFileSync(process.execPath, [entry, 'hook', 'preToolUse'], { env, encoding: 'utf8', input: JSON.stringify({ toolName: 'view', toolArgs: {} }) })
   assert.equal(hook, '')
   assert.equal((await json('scripts/agent-hooks.lock.json')).host, 'copilot')
+})
+
+// The Copilot runtime in VS Code passes hooks no toolCallId. agent-hooks 0.5.0
+// recorded an error for such a call instead of checking it.
+test('a connected hook without a tool call ID is checked and leaves no error', async (t) => {
+  const home = await mkdtemp(join(tmpdir(), 'actera-copilot-no-id-'))
+  const asked = []
+  const server = createServer(async (request, response) => {
+    for await (const chunk of request) void chunk
+    asked.push(request.url)
+    response.setHeader('content-type', 'application/json')
+    response.end(JSON.stringify(request.url === '/v1/decisions' ? { id: '00000000-0000-4000-8000-000000000001', status: 'MONITORED' } : {}))
+  })
+  await new Promise((resolve) => server.listen(0, '127.0.0.1', resolve))
+  t.after(async () => {
+    await new Promise((resolve) => server.close(resolve))
+    await rm(home, { recursive: true, force: true, maxRetries: 10, retryDelay: 100 })
+  })
+  const { configure } = await import('../../plugins/actera/vendor/agent-hooks/src/core/bridge.mjs')
+  await configure({ baseUrl: `http://127.0.0.1:${server.address().port}`, apiKey: 'actera_' + 'p'.repeat(40), agentId: 'copilot-test', capture: 'tool-inputs' }, home)
+  const entry = fileURLToPath(new URL('../../plugins/actera/bin/actera-hook.mjs', import.meta.url))
+  const env = { ...process.env, ACTERA_COPILOT_BRIDGE_HOME: home }
+  for (const name of ['ACTERA_MODE', 'ACTERA_EVALUATION_FAILURE']) delete env[name]
+  // The fixture answers from this process, so the hook must not block it.
+  const run = (args, input = '') => new Promise((resolve, reject) => {
+    const child = spawn(process.execPath, [entry, ...args], { env, windowsHide: true })
+    let stdout = ''
+    child.stdout.on('data', (chunk) => { stdout += chunk })
+    child.on('error', reject)
+    child.on('close', () => resolve(stdout))
+    child.stdin.end(input)
+  })
+  const call = { sessionId: 'session-1', cwd: '/work', toolName: 'view', toolArgs: { path: '/work/note.txt' } }
+  assert.equal(await run(['hook', 'preToolUse'], JSON.stringify(call)), '')
+  await run(['hook', 'postToolUse'], JSON.stringify({ ...call, toolResult: { resultType: 'success', textResultForLlm: 'hello' } }))
+  assert.ok(asked.includes('/v1/decisions'), 'The call was sent to Actera')
+  assert.ok(asked.some((url) => url.endsWith('/reports')), 'Its outcome was reported')
+  assert.equal(JSON.parse(await run(['status'])).lastError, undefined)
 })
 
 test('the marketplace lists this plugin and the manifest names its hooks and skills', async () => {

@@ -33,7 +33,7 @@ The plugin starts in Monitoring mode, which records decisions and never blocks. 
 
 The plugin connects only to the Actera service at `https://app.actera.dev`, over HTTPS.
 
-Each decision request and execution report contains the tool name, the redacted tool input, the MCP server and tool name for MCP tools, Copilot's session, subagent and tool call identifiers, and the working directory.
+Each decision request and execution report contains the tool name, the redacted tool input, the MCP server and tool name for MCP tools, Copilot's session and subagent identifiers, the tool call identifier where Copilot passes one, and the working directory.
 
 Sensitive field names are masked, and Gitleaks looks for credentials in argument strings, before anything is stored or sent. Detection is best effort. Ordinary commands and file paths remain visible to policies. Prompt text, model output, and tool results are never sent.
 

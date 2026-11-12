@@ -39,8 +39,10 @@ take; a pull request from a fork gets that second install once it is merged.
 On a supported Copilot CLI, verify connecting (browser approval and a setup code),
 an allowed call, a blocked call, a held call approved in Actera and one rejected, a
 hold that runs out and its approved retry, an MCP tool, an unavailable API, a
-queued report flush, disconnecting, and a plugin update. CI does not exercise the
-full host and service path.
+queued report flush, disconnecting, and a plugin update. In VS Code, with the
+plugin installed from the CLI, verify an allowed call, a blocked call, a held
+call and an MCP tool in its Copilot agent. CI does not exercise the full host and
+service path.
 
 A plugin can be disabled or uninstalled, and Copilot lets a call run when a hook
 exceeds its timeout. Actera's decision is advisory in that case; mandatory
