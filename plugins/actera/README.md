@@ -2,7 +2,7 @@
 
 Actera decides whether AI agents may take actions. This plugin sends each GitHub Copilot CLI tool call to your Actera workspace before it runs. Your policies allow it, block it, or hold it until a reviewer approves, and every attempt is recorded as a decision with its outcome.
 
-The plugin is tested with the GitHub Copilot CLI. VS Code, the GitHub Copilot app and Copilot in the cloud can also load Copilot plugins; the hooks have not been tested there. It needs an Actera account, Node.js 22 or later, and GitHub Copilot CLI 1.0.109 or later.
+The plugin is tested with the GitHub Copilot CLI and with the Copilot agent in VS Code, which picks up plugins installed with the CLI and uses the same connection and mode. The GitHub Copilot app and Copilot in the cloud can also load Copilot plugins; the hooks have not been tested there. It needs an Actera account, Node.js 22 or later, and GitHub Copilot CLI 1.0.109 or later.
 
 ## Get started
 
@@ -33,7 +33,7 @@ The plugin starts in Monitoring mode, which records decisions and never blocks. 
 
 The plugin connects only to the Actera service at `https://app.actera.dev`, over HTTPS.
 
-Each decision request and execution report contains the tool name, the redacted tool input, the MCP server and tool name for MCP tools, Copilot's session, subagent and tool call identifiers, and the working directory.
+Each decision request and execution report contains the tool name, the redacted tool input, the MCP server and tool name for MCP tools, Copilot's session and subagent identifiers, the tool call identifier where Copilot passes one, and the working directory.
 
 Sensitive field names are masked, and Gitleaks looks for credentials in argument strings, before anything is stored or sent. Detection is best effort. Ordinary commands and file paths remain visible to policies. Prompt text, model output, and tool results are never sent.
 
