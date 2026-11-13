@@ -42,7 +42,9 @@ hold that runs out and its approved retry, an MCP tool, an unavailable API, a
 queued report flush, disconnecting, and a plugin update. In VS Code, with the
 plugin installed from the CLI, verify an allowed call, a blocked call, a held
 call and an MCP tool in its Copilot agent. CI does not exercise the full host and
-service path.
+service path, and it cannot tell whether Copilot loads the hooks: a plugin whose
+hooks file is in the wrong place installs with the same output. Confirm in a real
+session that a tool call reaches Actera.
 
 A plugin can be disabled or uninstalled, and Copilot lets a call run when a hook
 exceeds its timeout. Actera's decision is advisory in that case; mandatory

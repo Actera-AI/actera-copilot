@@ -82,7 +82,7 @@ test('a connected hook without a tool call ID is checked and leaves no error', a
   assert.equal(JSON.parse(await run(['status'])).lastError, undefined)
 })
 
-test('the marketplace lists this plugin and the manifest names its hooks and skills', async () => {
+test('the marketplace lists this plugin and its manifest is an Agent Plugins 1.0 manifest', async () => {
   const marketplace = await json('.github/plugin/marketplace.json')
   assert.equal(marketplace.name, 'actera')
   assert.deepEqual(marketplace.plugins.map((p) => [p.name, p.source]), [['actera', './plugins/actera']])
@@ -94,6 +94,7 @@ test('the marketplace lists this plugin and the manifest names its hooks and ski
   assert.deepEqual(Object.keys(manifest).filter((field) => !fields.includes(field)), [])
   assert.ok(manifest.keywords.length <= 10 && manifest.keywords.every((keyword) => /^[a-z0-9-]{1,30}$/.test(keyword)))
   assert.ok(manifest.description.length <= 500)
+  assert.deepEqual(Object.keys(manifest.author).filter((key) => !['name', 'email', 'url'].includes(key)), [])
   assert.equal(manifest.name, 'actera')
   assert.equal(manifest.license, 'Apache-2.0')
   assert.equal(manifest.repository, 'https://github.com/Actera-AI/actera-copilot')
