@@ -12,7 +12,8 @@ import { checkVendored } from '../../scripts/vendor-agent-hooks.mjs'
 const json = async (name) => JSON.parse(await readFile(new URL('../../' + name, import.meta.url), 'utf8'))
 
 test('every tool call goes through the vendored Copilot adapter, with time to hold for approval', async () => {
-  const config = await json('plugins/actera/hooks/hooks.json')
+  // Agent Plugins 1.0 has no hooks of its own: Copilot finds them in its namespace folder.
+  const config = await json('plugins/actera/com.github.copilot/hooks/hooks.json')
   assert.equal(config.version, 1)
   // Copilot's native camelCase events carry its own tool names.
   assert.deepEqual(Object.keys(config.hooks).sort(), ['postToolUse', 'postToolUseFailure', 'preToolUse'])
@@ -81,14 +82,20 @@ test('a connected hook without a tool call ID is checked and leaves no error', a
   assert.equal(JSON.parse(await run(['status'])).lastError, undefined)
 })
 
-test('the marketplace lists this plugin and the manifest names its hooks and skills', async () => {
+test('the marketplace lists this plugin and its manifest is an Agent Plugins 1.0 manifest', async () => {
   const marketplace = await json('.github/plugin/marketplace.json')
   assert.equal(marketplace.name, 'actera')
   assert.deepEqual(marketplace.plugins.map((p) => [p.name, p.source]), [['actera', './plugins/actera']])
-  const manifest = await json('plugins/actera/.github/plugin/plugin.json')
+  const manifest = await json('plugins/actera/plugin.json')
+  // An Agent Plugins 1.0 manifest at the plugin root, with that version's fields only:
+  // skills and hooks are found by their folders, not named here.
+  assert.equal(manifest.$schema, 'https://agent-plugins.org/schemas/1.0.0/plugin.schema.json')
+  const fields = ['$schema', 'name', 'version', 'description', 'author', 'homepage', 'repository', 'license', 'keywords', 'extensions']
+  assert.deepEqual(Object.keys(manifest).filter((field) => !fields.includes(field)), [])
+  assert.ok(manifest.keywords.length <= 10 && manifest.keywords.every((keyword) => /^[a-z0-9-]{1,30}$/.test(keyword)))
+  assert.ok(manifest.description.length <= 500)
+  assert.deepEqual(Object.keys(manifest.author).filter((key) => !['name', 'email', 'url'].includes(key)), [])
   assert.equal(manifest.name, 'actera')
-  assert.equal(manifest.hooks, 'hooks/hooks.json')
-  assert.equal(manifest.skills, 'skills/')
   assert.equal(manifest.license, 'Apache-2.0')
   assert.equal(manifest.repository, 'https://github.com/Actera-AI/actera-copilot')
   assert.equal(marketplace.plugins[0].version, manifest.version, 'The catalog and the manifest name one version')

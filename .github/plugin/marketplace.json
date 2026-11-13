@@ -12,7 +12,7 @@
       "name": "actera",
       "source": "./plugins/actera",
       "description": "Check GitHub Copilot CLI tool calls against Actera policies, hold calls that need approval, and report their outcomes",
-      "version": "0.1.1"
+      "version": "0.1.2"
     }
   ]
 }
