@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.1.2
+
+- The plugin follows the Agent Plugins 1.0 layout: its manifest is `plugin.json` at the plugin
+  root, and its hooks are in `com.github.copilot/hooks/hooks.json`. Behavior is unchanged.
+
 ## 0.1.1
 
 - Works with the Copilot agent in VS Code, which loads plugins installed with the CLI. Its

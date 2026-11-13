@@ -10,7 +10,7 @@ import { lockedFiles } from './vendor-agent-hooks.mjs'
 const gitleaks = 'vendor/agent-hooks/vendor/gitleaks'
 export const skills = ['connect', 'status', 'mode', 'disconnect']
 export const pluginFiles = [
-  '.github/plugin/plugin.json', 'LICENSE', 'NOTICE', 'README.md', 'bin/actera-hook.mjs', 'hooks/hooks.json',
+  'LICENSE', 'NOTICE', 'README.md', 'bin/actera-hook.mjs', 'com.github.copilot/hooks/hooks.json', 'plugin.json',
   ...skills.map(skill => `skills/${skill}/SKILL.md`),
   ...lockedFiles().map(file => `vendor/agent-hooks/${file}`),
 ].sort()
@@ -39,7 +39,7 @@ export async function checkPlugin(root = source) {
     assert.equal(hash(bytes), entry.compressedSha256)
     assert.equal(hash(gunzipSync(bytes)), entry.sha256)
   }
-  const manifest = JSON.parse(await readFile(resolve(root, '.github/plugin/plugin.json'), 'utf8'))
+  const manifest = JSON.parse(await readFile(resolve(root, 'plugin.json'), 'utf8'))
   console.log(`Plugin ${manifest.version}: ${pluginFiles.length} runtime/license files verified at ${root}`)
 }
 

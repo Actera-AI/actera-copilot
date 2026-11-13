@@ -65,7 +65,7 @@ copilot plugin install actera@actera
 ## Changes and releases
 
 Describe user-visible changes in `CHANGELOG.md` and bump the version in
-`plugins/actera/.github/plugin/plugin.json` and `.github/plugin/marketplace.json`
+`plugins/actera/plugin.json` and `.github/plugin/marketplace.json`
 in the same pull request. Follow the [installation checks](docs/installation-checks.md)
 before merging a version bump. Participation is governed by the
 [code of conduct](CODE_OF_CONDUCT.md).
